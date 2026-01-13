@@ -239,8 +239,8 @@
         <div class="card threshold-section">
             <label>Shake Threshold</label>
             <div class="slider-container">
-                <input type="range" id="thresholdSlider" min="5" max="30" value="15" step="1">
-                <span class="threshold-value"><span id="thresholdValue">15</span> m/s²</span>
+                <input type="range" id="thresholdSlider" min="0.5" max="10" value="2" step="0.5">
+                <span class="threshold-value"><span id="thresholdValue">2</span> m/s²</span>
             </div>
         </div>
 
@@ -257,7 +257,7 @@
     <script>
         // State
         let isMonitoring = false;
-        let threshold = 15;
+        let threshold = 2;
         let lastAlertTime = 0;
         const alertCooldown = 2000; // 2 seconds between alerts
         const historyMax = 20;
@@ -318,15 +318,16 @@
             const acc = event.accelerationIncludingGravity;
             if (!acc || acc.x === null) return;
 
-            // Calculate magnitude
-            const magnitude = Math.sqrt(acc.x * acc.x + acc.y * acc.y + acc.z * acc.z);
+            // Calculate horizontal magnitude only (X and Y axes)
+            // Z axis is ignored since device lies flat on desk
+            const magnitude = Math.sqrt(acc.x * acc.x + acc.y * acc.y);
 
-            // Subtract gravity (~9.8) to get actual movement
-            const adjustedMagnitude = Math.abs(magnitude - 9.8);
+            // No gravity subtraction needed - gravity acts on Z axis when flat
+            const adjustedMagnitude = magnitude;
 
             // Update display
             magnitudeValue.textContent = adjustedMagnitude.toFixed(1);
-            const fillPercent = Math.min((adjustedMagnitude / 30) * 100, 100);
+            const fillPercent = Math.min((adjustedMagnitude / 10) * 100, 100);
             magnitudeFill.style.width = fillPercent + '%';
 
             // Check threshold
